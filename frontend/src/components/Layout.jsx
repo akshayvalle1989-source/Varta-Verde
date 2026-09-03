@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Search, Mic, Languages, User, Phone } from "lucide-react";
+import { Search, Mic, Languages, Phone } from "lucide-react";
 import { useLang } from "@/store";
 import VedaChat from "@/components/VedaChat";
 
@@ -62,9 +62,15 @@ function Navbar() {
               <Languages size={16} />
               {lang === "en" ? "English" : "हिंदी"}
             </button>
-            <div className="h-9 w-9 rounded-full bg-clay grid place-items-center">
-              <User size={17} />
-            </div>
+            <a
+              href="tel:18001801551"
+              data-testid="kisan-helpline"
+              title={lang === "hi" ? "किसान कॉल सेंटर 1800-180-1551" : "Kisan Call Centre 1800-180-1551"}
+              className="flex items-center gap-2 h-9 rounded-full bg-clay hover:bg-clay-rich transition-colors px-3 text-sm font-semibold"
+            >
+              <Phone size={16} />
+              <span className="hidden lg:inline">1800-180-1551</span>
+            </a>
           </div>
         </div>
       </div>
