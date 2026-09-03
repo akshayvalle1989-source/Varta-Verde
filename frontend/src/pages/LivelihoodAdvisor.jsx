@@ -33,7 +33,6 @@ export default function LivelihoodAdvisor() {
         title={lang === "hi" ? "आजीविका एवं बागवानी सलाहकार" : "Livelihood & Horticulture Advisor"}
         subtitle={lang === "hi" ? "फूल, फल और नर्सरी से साप्ताहिक नकदी प्रवाह — 40-50% MIDH सब्सिडी के साथ।" : "Unlock weekly cash flow with flowers, fruits & nurseries — backed by 40-50% MIDH capital subsidy."}
         badge="MIDH Horticulture Active"
-        hideListen
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-[380px_1fr] gap-5">
