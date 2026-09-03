@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send, Mic, Volume2, Sprout } from "lucide-react";
 import { useChat, useLang, speak, getRecognizer } from "@/store";
-import { api } from "@/lib/api";
+import { API } from "@/lib/api";
 
 export default function VedaChat() {
   const { open, setOpen, openChat, autoVoice, setAutoVoice } = useChat();
@@ -36,15 +36,37 @@ export default function VedaChat() {
 
   const send = async (text) => {
     const q = (text ?? input).trim();
-    if (!q) return;
-    setMsgs((m) => [...m, { role: "user", text: q }]);
+    if (!q || loading) return;
+    setMsgs((m) => [...m, { role: "user", text: q }, { role: "bot", text: "", streaming: true }]);
     setInput("");
     setLoading(true);
+    const patchLast = (fn) => setMsgs((m) => { const c = [...m]; c[c.length - 1] = fn(c[c.length - 1]); return c; });
     try {
-      const { data } = await api.post("/chat", { message: q, lang });
-      setMsgs((m) => [...m, { role: "bot", text: data.reply, escalate: data.escalate }]);
+      const r = await fetch(`${API}/chat/stream`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: q, lang, session_id: localStorage.getItem("veda_session") }),
+      });
+      if (!r.ok || !r.body) throw new Error("bad response");
+      const reader = r.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const parts = buf.split("\n\n");
+        buf = parts.pop();
+        for (const p of parts) {
+          if (!p.startsWith("data: ")) continue;
+          const ev = JSON.parse(p.slice(6));
+          if (ev.type === "start") localStorage.setItem("veda_session", ev.session_id);
+          else if (ev.type === "token") patchLast((b) => ({ ...b, text: b.text + ev.content }));
+          else if (ev.type === "done") patchLast((b) => ({ ...b, streaming: false, escalate: ev.escalate }));
+        }
+      }
+      patchLast((b) => ({ ...b, streaming: false }));
     } catch (e) {
-      setMsgs((m) => [...m, { role: "bot", text: "Network issue. Please try again." }]);
+      patchLast((b) => ({ ...b, streaming: false, text: b.text || (lang === "hi" ? "नेटवर्क समस्या। कृपया पुनः प्रयास करें या 1800-180-1551 पर कॉल करें।" : "Network issue. Please try again or call 1800-180-1551."), escalate: !b.text }));
     } finally {
       setLoading(false);
     }
@@ -90,7 +112,7 @@ export default function VedaChat() {
             <span className="h-9 w-9 rounded-full bg-verdant grid place-items-center"><Sprout size={18} /></span>
             <div className="flex-1">
               <div className="font-bold leading-tight">Veda Verde</div>
-              <div className="text-[11px] text-sand/70">AI Krishi Mitra • {lang === "hi" ? "हिंदी" : "English"}</div>
+              <div className="text-[11px] text-sand/70">AI Krishi Mitra • GPT-5 mini • {lang === "hi" ? "हिंदी" : "English"}</div>
             </div>
             <button data-testid="veda-close" onClick={() => setOpen(false)} className="p-1.5 hover:bg-white/10 rounded-full"><X size={18} /></button>
           </div>
@@ -106,8 +128,9 @@ export default function VedaChat() {
                       : "bg-white border border-sand-ochre text-soil rounded-bl-sm"
                   }`}
                 >
-                  {m.text}
-                  {m.role === "bot" && (
+                  <span className="whitespace-pre-wrap">{m.text}</span>
+                  {m.streaming && <span className="inline-block w-1.5 h-3.5 bg-verdant ml-1 animate-pulse align-middle" />}
+                  {m.role === "bot" && !m.streaming && m.text && (
                     <button
                       onClick={() => speak(m.text, lang)}
                       className="ml-2 align-middle text-clay hover:text-clay-deep inline-flex"
@@ -116,14 +139,14 @@ export default function VedaChat() {
                       <Volume2 size={14} />
                     </button>
                   )}
-                  {m.escalate && (
-                    <a href="tel:18001801551" className="block mt-2 text-xs font-semibold text-clay underline">📞 Call KVK 1800-180-1551</a>
+                  {m.escalate && !m.streaming && (
+                    <a href="tel:18001801551" data-testid="veda-helpline" className="block mt-2 text-xs font-semibold text-clay underline">📞 Kisan Call Centre 1800-180-1551</a>
                   )}
                 </div>
               </div>
             ))}
-            {loading && (
-              <div className="flex justify-start"><div className="bg-white border border-sand-ochre rounded-2xl px-3 py-2 text-sm text-soil-variant">…</div></div>
+            {loading && !msgs[msgs.length - 1]?.text && (
+              <div className="flex justify-start"><div className="bg-white border border-sand-ochre rounded-2xl px-3 py-2 text-sm text-soil-variant animate-pulse">{lang === "hi" ? "सोच रही हूँ…" : "Thinking…"}</div></div>
             )}
           </div>
 

@@ -13,6 +13,7 @@ from typing import List, Optional
 from datetime import datetime, timezone
 
 import seed_data
+import veda_agent
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -426,6 +427,63 @@ async def chat(inp: ChatInput):
                 if hi else
                 "I'm not fully sure about that. Try asking about machinery, crops, horticulture, seeds, or schemes — or reach your local KVK officer at the Kisan Call Centre 1800-180-1551.")
     return {"reply": fallback, "confidence": 0.4, "intent": "fallback", "escalate": True}
+
+
+class ChatStreamInput(BaseModel):
+    message: str
+    lang: str = "en"
+    session_id: Optional[str] = None
+
+
+@api_router.post("/chat/stream")
+async def chat_stream(inp: ChatStreamInput):
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+
+    message = inp.message.strip()[:1200]
+    session_id = inp.session_id or str(uuid.uuid4())
+    history = await db.chat_messages.find({"session_id": session_id}, {"_id": 0, "role": 1, "text": 1}).sort("ts", 1).to_list(20)
+
+    async def gen():
+        yield f"data: {json.dumps({'type': 'start', 'session_id': session_id})}\n\n"
+        if not message:
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+            return
+        llm = LlmChat(api_key=os.environ["EMERGENT_LLM_KEY"], session_id=session_id,
+                      system_message=veda_agent.system_prompt(inp.lang)).with_model("openai", "gpt-5-mini")
+        full, tail = [], ""
+        try:
+            async for ev in llm.stream_message(UserMessage(text=veda_agent.build_user_turn(message, history, inp.lang))):
+                if isinstance(ev, TextDelta):
+                    tail += ev.content
+                    # hold back a small tail so the [[HELPLINE]] marker never leaks to the UI
+                    if len(tail) > len(veda_agent.HELPLINE_MARK) + 4:
+                        cut = len(tail) - len(veda_agent.HELPLINE_MARK)
+                        emit, tail = tail[:cut], tail[cut:]
+                        full.append(emit)
+                        yield f"data: {json.dumps({'type': 'token', 'content': emit})}\n\n"
+                elif isinstance(ev, StreamDone):
+                    break
+        except Exception:
+            logger.exception("Veda LLM stream failed; falling back to rule engine")
+            fb = await chat(ChatInput(message=message, lang=inp.lang))
+            yield f"data: {json.dumps({'type': 'token', 'content': fb['reply']})}\n\n"
+            yield f"data: {json.dumps({'type': 'done', 'escalate': bool(fb.get('escalate'))})}\n\n"
+            return
+        escalate = veda_agent.HELPLINE_MARK in tail
+        tail = tail.replace(veda_agent.HELPLINE_MARK, "").rstrip()
+        if tail:
+            full.append(tail)
+            yield f"data: {json.dumps({'type': 'token', 'content': tail})}\n\n"
+        reply = "".join(full).strip()
+        now = datetime.now(timezone.utc).isoformat()
+        await db.chat_messages.insert_many([
+            {"session_id": session_id, "role": "user", "text": message, "lang": inp.lang, "ts": now},
+            {"session_id": session_id, "role": "bot", "text": reply, "escalate": escalate, "lang": inp.lang, "ts": now + "1"},
+        ])
+        yield f"data: {json.dumps({'type': 'done', 'escalate': escalate})}\n\n"
+
+    return StreamingResponse(gen(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 app.include_router(api_router)

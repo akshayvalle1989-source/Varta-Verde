@@ -53,3 +53,9 @@ Build a complete website from the attached PRD (varta_verde_prd.pdf) using the p
 - New SSE endpoint `POST /api/advisor/machinery/ai`: emits rule-based `cards` plan first, then streams `token` narrative grounded in `/app/backend/data/India_Farm_Machinery_Solutions_By_Soil_Type.md` (MD primary + general agronomy allowed). Advisories logged to `machinery_advisories` collection.
 - Frontend: optional Crop & Notes textarea, Stop button, streamed markdown advisory (react-markdown, `.advisory-md` styles), Listen (TTS) on result, EN/HI aware.
 - Removed home "Need Diagnostic Assistance" section; removed Listen (AI Voice) from Machinery header (`hideListen` prop).
+
+## Update (2026-06) — Veda Verde live AI
+- `POST /api/chat/stream` (SSE) powered by GPT-5 mini via Emergent key; `backend/veda_agent.py` holds guardrailed system prompt, keyword retrieval over the 3 MD guides in `backend/data/` + curated seed-data JSON as knowledge base.
+- Guardrails: strict scope, no invented figures/phones/URLs, prompt-injection resistance, off-topic -> polite redirect to Kisan Call Centre 1800-180-1551 with `[[HELPLINE]]` marker (stripped server-side, surfaces as call button). Falls back to rule engine on LLM failure.
+- Session memory: `chat_messages` collection, session_id persisted in localStorage; last 6 turns passed as context.
+- VedaChat.jsx streams tokens; verdant green FAB/header.
