@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 34 60% 97%;
+        --foreground: 22 47% 12%;
+        --card: 0 0% 100%;
+        --card-foreground: 22 47% 12%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 22 47% 12%;
+        --primary: 18 55% 46%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 33 40% 92%;
+        --secondary-foreground: 22 47% 12%;
+        --muted: 33 35% 92%;
+        --muted-foreground: 20 20% 40%;
+        --accent: 152 36% 20%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 0 84% 45%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 30 30% 84%;
+        --input: 30 30% 84%;
+        --ring: 18 55% 46%;
+        --radius: 0.75rem;
+    }
+}
+
+@layer base {
+    * { @apply border-border; }
+    body {
+        margin: 0;
+        @apply bg-sand text-soil font-sans;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    ::selection { background: #b85d36; color: #fff; }
+}
+
+/* Warli-style dotted decorative divider */
+.warli-band {
+    height: 26px;
+    background-color: #20432f;
+    background-image: radial-gradient(circle, #e8dacb 1.4px, transparent 1.5px);
+    background-size: 16px 16px;
+    background-position: center;
+}
+
+.field-card {
+    @apply bg-white border-[1.5px] border-sand-ochre rounded-xl;
+}
+
+/* custom scrollbar for chat */
+.veda-scroll::-webkit-scrollbar { width: 6px; }
+.veda-scroll::-webkit-scrollbar-thumb { background: #dbc1b8; border-radius: 999px; }
+
+input[type="range"].clay-range {
+    -webkit-appearance: none; height: 6px; border-radius: 999px;
+    background: linear-gradient(90deg,#b85d36 var(--val,50%), #e8dacb var(--val,50%));
+}
+input[type="range"].clay-range::-webkit-slider-thumb {
+    -webkit-appearance: none; height: 22px; width: 22px; border-radius: 999px;
+    background: #9c4724; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); cursor: pointer;
+}
