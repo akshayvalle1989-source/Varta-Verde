@@ -74,7 +74,7 @@ export default function VedaChat() {
         <button
           data-testid="veda-fab"
           onClick={() => openChat(false)}
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-clay hover:bg-clay-deep text-white pl-4 pr-5 h-14 rounded-full shadow-earth-lg transition-all hover:scale-105"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-verdant hover:bg-verdant-deep text-white pl-4 pr-5 h-14 rounded-full shadow-earth-lg transition-all hover:scale-105"
         >
           <span className="h-8 w-8 rounded-full bg-white/20 grid place-items-center"><Sprout size={18} /></span>
           <span className="font-semibold text-sm">{lang === "hi" ? "वेदा वर्दे" : "Ask Veda Verde"}</span>
@@ -86,8 +86,8 @@ export default function VedaChat() {
           data-testid="veda-panel"
           className="fixed bottom-5 right-5 z-50 w-[92vw] max-w-[380px] h-[560px] max-h-[80vh] bg-white rounded-2xl shadow-earth-lg border-[1.5px] border-sand-ochre flex flex-col overflow-hidden"
         >
-          <div className="bg-clay-dark text-white px-4 py-3 flex items-center gap-3">
-            <span className="h-9 w-9 rounded-full bg-clay grid place-items-center"><Sprout size={18} /></span>
+          <div className="bg-verdant-deep text-white px-4 py-3 flex items-center gap-3">
+            <span className="h-9 w-9 rounded-full bg-verdant grid place-items-center"><Sprout size={18} /></span>
             <div className="flex-1">
               <div className="font-bold leading-tight">Veda Verde</div>
               <div className="text-[11px] text-sand/70">AI Krishi Mitra • {lang === "hi" ? "हिंदी" : "English"}</div>

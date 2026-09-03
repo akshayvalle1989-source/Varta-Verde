@@ -18,6 +18,7 @@ module.exports = {
         soil: { DEFAULT: '#2e1a10', ink: '#1e1b15', variant: '#55433c' },
         sand: { DEFAULT: '#fcf8f2', bright: '#fcf8f2', ochre: '#e8dacb', container: '#f5ede2', low: '#fbf2e7' },
         forest: { DEFAULT: '#20432f', deep: '#012d1d', dark: '#143326', sage: '#e2ece5', mid: '#426650' },
+        verdant: { DEFAULT: '#2f8f46', deep: '#237337' },
         marigold: { DEFAULT: '#eab308', dark: '#ca8a04', light: '#fef08a' },
         bloom: { DEFAULT: '#db2777', deep: '#be185d', soft: '#f472b6', mist: '#fdf2f8' },
         background: 'hsl(var(--background))',
