@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { Sliders, Tractor, AlertTriangle, Fuel, Gauge, Ruler, Zap, Building2, Download, Mic, Sprout, Sparkles, Square, Volume2 } from "lucide-react";
-import { PageHeader, Panel, Field, OptionGrid, Segmented, Chip } from "@/components/advisor";
+import { PageHeader, Panel, Field, OptionGrid, Segmented, Chip, useScrollToResults } from "@/components/advisor";
 import { useLang, useChat, speak } from "@/store";
 import { API } from "@/lib/api";
 
@@ -27,6 +27,7 @@ export default function MachineryAdvisor() {
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState("");
   const abortRef = useRef(null);
+  const resultsRef = useScrollToResults(res);
 
   const stop = () => { abortRef.current?.abort(); setStreaming(false); };
 
@@ -145,7 +146,7 @@ export default function MachineryAdvisor() {
         </Panel>
 
         {/* Results */}
-        <div className="space-y-4">
+        <div className="space-y-4" ref={resultsRef} data-testid="advisor-results">
           {!res && !streaming && !error && (
             <div className="field-card p-10 text-center text-soil-variant" data-testid="machinery-empty">
               <Tractor size={40} className="mx-auto text-sand-ochre" />

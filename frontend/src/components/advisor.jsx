@@ -1,3 +1,17 @@
+import { useEffect, useRef } from "react";
+
+// Scrolls the results column into view whenever `trigger` becomes truthy
+export function useScrollToResults(trigger) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!trigger || !ref.current) return;
+    const top = ref.current.getBoundingClientRect().top + window.scrollY - 140;
+    window.scrollTo({ top, behavior: "smooth" });
+  }, [trigger]);
+  return ref;
+}
+
+
 export function PageHeader({ title, subtitle, badge }) {
   return (
     <div className="bg-forest-deep text-white">

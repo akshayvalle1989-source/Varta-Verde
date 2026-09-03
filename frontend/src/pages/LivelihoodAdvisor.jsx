@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Sliders, Flower2, CalendarClock, Wallet, TrendingUp, MapPin, ArrowRight } from "lucide-react";
-import { PageHeader, Panel, Field, OptionGrid, Chip } from "@/components/advisor";
+import { PageHeader, Panel, Field, OptionGrid, Chip, useScrollToResults } from "@/components/advisor";
 import { useLang } from "@/store";
 import { api } from "@/lib/api";
 
@@ -18,6 +18,7 @@ export default function LivelihoodAdvisor() {
   const [dist, setDist] = useState(40);
   const [res, setRes] = useState(null);
   const [loading, setLoading] = useState(false);
+  const resultsRef = useScrollToResults(res);
 
   const calc = async () => {
     setLoading(true);
@@ -64,7 +65,7 @@ export default function LivelihoodAdvisor() {
           </button>
         </Panel>
 
-        <div className="space-y-4">
+        <div className="space-y-4" ref={resultsRef} data-testid="advisor-results">
           {!res && (
             <div className="field-card p-10 text-center text-soil-variant">
               <Flower2 size={40} className="mx-auto text-sand-ochre" />
