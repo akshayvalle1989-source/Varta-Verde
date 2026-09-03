@@ -32,7 +32,7 @@ export function PageHeader({ title, subtitle, badge }) {
 
 export function Panel({ title, step, children }) {
   return (
-    <div className="field-card p-5 h-fit sticky top-40">
+    <div className="field-card p-5 h-fit lg:sticky lg:top-40">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-lg text-soil">{title}</h2>
         {step && <span className="text-xs bg-sand-container text-clay-dark rounded-full px-3 py-1 font-semibold">{step}</span>}
