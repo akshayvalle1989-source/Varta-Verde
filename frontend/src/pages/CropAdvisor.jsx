@@ -36,6 +36,7 @@ export default function CropAdvisor() {
         title={lang === "hi" ? "फसल विविधीकरण सलाहकार" : "Crop Diversification Advisor"}
         subtitle={lang === "hi" ? "जलवायु-सहनशील बाजरा और तिलहन जो 70% तक कम सिंचाई में उगते हैं और MSP से सुरक्षित हैं।" : "Climate-resilient millets & oilseeds needing up to 70% less irrigation than water-guzzling crops, secured under Government MSP."}
         badge="NFSM Nutri-Cereals Active"
+        hideListen
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-[380px_1fr] gap-5">
