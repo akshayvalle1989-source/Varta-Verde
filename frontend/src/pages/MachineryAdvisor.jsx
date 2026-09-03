@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Sliders, Tractor, AlertTriangle, Fuel, Gauge, Ruler, Zap, Building2, Download, Mic, Sprout } from "lucide-react";
+import { useState, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import { Sliders, Tractor, AlertTriangle, Fuel, Gauge, Ruler, Zap, Building2, Download, Mic, Sprout, Sparkles, Square, Volume2 } from "lucide-react";
 import { PageHeader, Panel, Field, OptionGrid, Segmented, Chip } from "@/components/advisor";
-import { useLang, useChat } from "@/store";
-import { api } from "@/lib/api";
+import { useLang, useChat, speak } from "@/store";
+import { API } from "@/lib/api";
 
 const SOILS = [
   { value: "heavy_clay", label: "Heavy Clay", sub: "High shear strength, compacts rapidly" },
@@ -20,18 +21,48 @@ export default function MachineryAdvisor() {
   const [topo, setTopo] = useState("flat");
   const [tillage, setTillage] = useState("zero");
   const [power, setPower] = useState("diesel");
+  const [notes, setNotes] = useState("");
   const [res, setRes] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [advice, setAdvice] = useState("");
+  const [streaming, setStreaming] = useState(false);
+  const [error, setError] = useState("");
+  const abortRef = useRef(null);
 
-  const calc = async () => {
-    setLoading(true);
+  const stop = () => { abortRef.current?.abort(); setStreaming(false); };
+
+  const advise = async () => {
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    setStreaming(true); setError(""); setAdvice(""); setRes(null);
     try {
-      const { data } = await api.post("/advisor/machinery", {
-        area: Number(area), area_unit: unit, soil, topography: topo, tillage, power,
+      const r = await fetch(`${API}/advisor/machinery/ai`, {
+        method: "POST", signal: ctrl.signal,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ area: Number(area), area_unit: unit, soil, topography: topo, tillage, power, lang, notes }),
       });
-      setRes(data);
+      if (!r.ok || !r.body) throw new Error(`Server error ${r.status}`);
+      const reader = r.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const parts = buf.split("\n\n");
+        buf = parts.pop();
+        for (const p of parts) {
+          if (!p.startsWith("data: ")) continue;
+          const ev = JSON.parse(p.slice(6));
+          if (ev.type === "cards") setRes(ev.plan);
+          else if (ev.type === "token") setAdvice((a) => a + ev.content);
+          else if (ev.type === "error") setError(ev.message);
+        }
+      }
+    } catch (e) {
+      if (e.name !== "AbortError") setError(e.message);
     } finally {
-      setLoading(false);
+      setStreaming(false);
     }
   };
 
@@ -95,22 +126,56 @@ export default function MachineryAdvisor() {
             </Field>
           </div>
 
+          <Field label={lang === "hi" ? "फसल / अतिरिक्त जानकारी (वैकल्पिक)" : "Crop & Notes (optional)"}>
+            <textarea
+              data-testid="machinery-notes"
+              value={notes} onChange={(e) => setNotes(e.target.value)} rows={2}
+              placeholder={lang === "hi" ? "जैसे: कपास + अरहर, बजट ₹4 लाख, ट्रैक्टर नहीं है" : "e.g. Cotton + pigeon pea, budget ₹4 lakh, no tractor yet"}
+              className="w-full bg-sand-container rounded-lg p-3 text-sm text-soil outline-none focus:ring-2 focus:ring-clay/40 resize-none placeholder:text-soil-variant/50"
+            />
+          </Field>
+
           <button
-            data-testid="calc-machinery"
-            onClick={calc} disabled={loading}
-            className="w-full bg-forest hover:bg-forest-dark text-white rounded-lg h-12 font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+            data-testid="ai-advise-machinery"
+            onClick={streaming ? stop : advise}
+            className={`w-full text-white rounded-lg h-12 font-semibold flex items-center justify-center gap-2 transition-colors ${streaming ? "bg-clay hover:bg-clay-deep" : "bg-forest hover:bg-forest-dark"}`}
           >
-            <Tractor size={18} /> {loading ? "Calculating…" : "Calculate Machinery & Implements"}
+            {streaming ? <><Square size={16} /> {lang === "hi" ? "रोकें" : "Stop"}</> : <><Sparkles size={18} /> {lang === "hi" ? "AI मशीनरी सलाह पाएं" : "Get AI Machinery Advice"}</>}
           </button>
+          <p className="text-[11px] text-soil-variant text-center -mt-1">Powered by GPT-5.4 Mini · grounded in the Varta Verde soil-machinery guide</p>
         </Panel>
 
         {/* Results */}
         <div className="space-y-4">
-          {!res && (
-            <div className="field-card p-10 text-center text-soil-variant">
+          {!res && !streaming && !error && (
+            <div className="field-card p-10 text-center text-soil-variant" data-testid="machinery-empty">
               <Tractor size={40} className="mx-auto text-sand-ochre" />
-              <p className="mt-3 font-semibold text-soil">Set your farm profile and tap Calculate</p>
-              <p className="text-sm">We'll match a soil-appropriate prime mover, implements & subsidies.</p>
+              <p className="mt-3 font-semibold text-soil">Set your farm profile and tap Get AI Machinery Advice</p>
+              <p className="text-sm">The advisor matches a soil-appropriate prime mover, implements & subsidies, then explains its reasoning.</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="field-card p-4 border-clay/40 bg-clay/5 text-sm text-clay-deep flex gap-2" data-testid="machinery-error">
+              <AlertTriangle size={18} className="shrink-0" /> {error}
+            </div>
+          )}
+
+          {(advice || streaming) && (
+            <div className="field-card overflow-hidden" data-testid="ai-advisory">
+              <div className="flex items-center justify-between px-5 py-3 bg-clay-dark text-white">
+                <span className="text-xs font-bold tracking-wide flex items-center gap-2"><Sparkles size={14} className="text-marigold" /> AI ADVISOR'S PERSONALISED RECOMMENDATION</span>
+                <div className="flex items-center gap-3">
+                  {streaming && <span className="text-[11px] text-sand/80 flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-marigold animate-pulse" /> Analysing guide…</span>}
+                  {!streaming && advice && (
+                    <button onClick={() => speak(advice.replace(/[#*_`>-]/g, " "), lang)} data-testid="ai-advisory-listen" className="text-xs flex items-center gap-1.5 hover:text-marigold-light"><Volume2 size={14} /> {lang === "hi" ? "सुनें" : "Listen"}</button>
+                  )}
+                </div>
+              </div>
+              <div className={`p-5 advisory-md ${lang === "hi" ? "font-deva" : ""}`} data-testid="ai-advisory-text">
+                {advice ? <ReactMarkdown>{advice}</ReactMarkdown> : <div className="space-y-2 animate-pulse"><div className="h-3 bg-sand-container rounded w-3/4" /><div className="h-3 bg-sand-container rounded w-full" /><div className="h-3 bg-sand-container rounded w-5/6" /></div>}
+                {streaming && advice && <span className="inline-block w-1.5 h-4 bg-clay ml-0.5 animate-pulse align-middle" />}
+              </div>
             </div>
           )}
 

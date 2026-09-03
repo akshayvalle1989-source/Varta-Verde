@@ -47,3 +47,9 @@ Build a complete website from the attached PRD (varta_verde_prd.pdf) using the p
 ## Update (2026-06)
 - Replaced SVG logo with user-provided Warli emblem (`/frontend/public/logo.png`, rendered via `Logo` in Layout.jsx).
 - Replaced green polka-dot `.warli-band` divider with an inline-SVG Warli art strip (dancing figures + triangle borders) in `index.css`.
+
+## Update (2026-06) — AI Machinery Advisor
+- Replaced "Calculate Machinery & Implements" with "Get AI Machinery Advice" (GPT-5.4 Mini via Emergent LLM key, emergentintegrations).
+- New SSE endpoint `POST /api/advisor/machinery/ai`: emits rule-based `cards` plan first, then streams `token` narrative grounded in `/app/backend/data/India_Farm_Machinery_Solutions_By_Soil_Type.md` (MD primary + general agronomy allowed). Advisories logged to `machinery_advisories` collection.
+- Frontend: optional Crop & Notes textarea, Stop button, streamed markdown advisory (react-markdown, `.advisory-md` styles), Listen (TTS) on result, EN/HI aware.
+- Removed home "Need Diagnostic Assistance" section; removed Listen (AI Voice) from Machinery header (`hideListen` prop).

@@ -1,8 +1,11 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import json
+import uuid
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
@@ -82,10 +85,85 @@ class MachineryInput(BaseModel):
     topography: str = "flat"        # flat | slope | terraced
     tillage: str = "zero"           # zero | conventional
     power: str = "diesel"           # diesel | electric
+    lang: str = "en"                # en | hi
+    notes: str = ""                 # crop grown / free-text farmer notes
 
 
 @api_router.post("/advisor/machinery")
 async def advise_machinery(inp: MachineryInput):
+    return await build_machinery_plan(inp)
+
+
+MACHINERY_MD = (ROOT_DIR / "data" / "India_Farm_Machinery_Solutions_By_Soil_Type.md").read_text(encoding="utf-8")
+
+SOIL_LABELS = {"heavy_clay": "Heavy Clay / Black Cotton soil", "sandy_loam": "Sandy Loam / Red & Yellow soil",
+               "alluvial": "Alluvial soil (Indo-Gangetic plains)", "arid": "Desert / Arid sandy soil"}
+
+
+def _machinery_prompt(inp: "MachineryInput", plan: dict) -> str:
+    lang_line = ("Write the entire advisory in simple Hindi (Devanagari script). Keep machine names in English inside brackets."
+                 if inp.lang == "hi" else "Write in clear, simple English suitable for an Indian smallholder farmer.")
+    return f"""FARMER PROFILE
+- Holding size: {inp.area} {inp.area_unit} ({plan['tier']})
+- Soil: {SOIL_LABELS.get(inp.soil, inp.soil)}
+- Topography: {inp.topography}
+- Cultivation practice: {'Zero / minimum tillage (conservation agriculture)' if inp.tillage == 'zero' else 'Conventional deep tillage'}
+- Power source preference: {inp.power}
+- Crop / farmer notes: {inp.notes.strip() or 'not provided'}
+
+RULE-ENGINE SHORTLIST (already shown to farmer as cards; validate, refine or challenge it using the guide):
+- Prime mover: {plan['prime_mover']['title']}
+- Implements: {', '.join(plan['implements'])}
+- Paired implement: {plan['secondary_implement']['name']}
+
+{lang_line}
+Produce a personalised machinery advisory with these markdown sections (## headings, short bullets, no tables):
+## Advisor's Assessment  (2-3 sentences on what this soil + holding size demand)
+## Recommended Prime Mover  (HP range, 2WD/4WD, tyre/ballast guidance, buy vs Custom Hiring Centre for this holding size)
+## Implement Set & Sequence  (primary tillage → secondary → sowing → intercultural → harvest; explain WHY each suits the soil)
+## Avoid / Cautions  (specific compaction, moisture, slope or timing mistakes for this soil)
+## Cost, Subsidy & Next Steps  (indicative costs from the guide, SMAM/CHC route, 3 concrete next steps)
+Keep it under 450 words. Cite figures (HP, depth, cost) only when they appear in the guide or the shortlist."""
+
+
+@api_router.post("/advisor/machinery/ai")
+async def advise_machinery_ai(inp: MachineryInput):
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+
+    plan = await build_machinery_plan(inp)
+    session_id = str(uuid.uuid4())
+
+    async def gen():
+        yield f"data: {json.dumps({'type': 'cards', 'plan': plan, 'session_id': session_id})}\n\n"
+        system = ("You are Varta Verde's Farm Machinery Advisor, an agricultural mechanisation expert for India. "
+                  "Ground every recommendation primarily in the reference guide below; you may add well-established "
+                  "general agronomy/mechanisation knowledge when the guide is silent, and say so briefly. Never invent "
+                  "scheme names, prices or HP figures not supported by the guide.\n\n=== REFERENCE GUIDE ===\n" + MACHINERY_MD)
+        chat = LlmChat(api_key=os.environ["EMERGENT_LLM_KEY"], session_id=session_id,
+                       system_message=system).with_model("openai", "gpt-5.4-mini")
+        full = []
+        try:
+            async for ev in chat.stream_message(UserMessage(text=_machinery_prompt(inp, plan))):
+                if isinstance(ev, TextDelta):
+                    full.append(ev.content)
+                    yield f"data: {json.dumps({'type': 'token', 'content': ev.content})}\n\n"
+                elif isinstance(ev, StreamDone):
+                    break
+        except Exception as e:
+            logger.exception("machinery AI stream failed")
+            yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
+            return
+        await db.machinery_advisories.insert_one({
+            "session_id": session_id, "input": inp.model_dump(), "plan": plan,
+            "advisory": "".join(full), "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
+
+    return StreamingResponse(gen(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+async def build_machinery_plan(inp: MachineryInput):
     soil = await db.soil_machinery.find_one({"key": inp.soil})
     if not soil:
         soil = await db.soil_machinery.find_one({"key": "heavy_clay"})
