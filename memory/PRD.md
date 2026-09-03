@@ -59,3 +59,6 @@ Build a complete website from the attached PRD (varta_verde_prd.pdf) using the p
 - Guardrails: strict scope, no invented figures/phones/URLs, prompt-injection resistance, off-topic -> polite redirect to Kisan Call Centre 1800-180-1551 with `[[HELPLINE]]` marker (stripped server-side, surfaces as call button). Falls back to rule engine on LLM failure.
 - Session memory: `chat_messages` collection, session_id persisted in localStorage; last 6 turns passed as context.
 - VedaChat.jsx streams tokens; verdant green FAB/header.
+
+## Update (2026-06) — Home hero
+- Removed Ramesh Ji personalised box (khasra, moisture, pest, cycle). New `components/Hero.jsx`: Krishi Mitra intro (SDG, Mission LiFE, emissions, productivity, biosafety, resilient landraces), farmer photo montage (`public/farmers/*.jpg`, Wikimedia Commons CC), "Find My Govt Scheme" CTA -> /schemes, voice Krishi Mitra card. EN/HI.

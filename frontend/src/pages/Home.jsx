@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Tractor, Wheat, Flower2, Leaf, Volume2, Mic, ArrowRight, PlayCircle,
+  Tractor, Wheat, Flower2, Leaf, Volume2, ArrowRight, PlayCircle,
   BadgeCheck, Download, Sprout,
 } from "lucide-react";
 import { useLang, useChat, speak } from "@/store";
 import { api } from "@/lib/api";
+import { Hero } from "@/components/Hero";
 
 const MODULES = [
   {
@@ -96,59 +97,19 @@ export default function Home() {
     api.get("/dashboard").then((r) => setData(r.data)).catch(() => {});
   }, []);
 
-  const f = data?.farmer;
   const schemes = data?.schemes || [];
   const story = data?.stories?.[0];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      {/* Welcome banner */}
-      <section className="rounded-2xl overflow-hidden shadow-earth bg-gradient-to-br from-clay-dark via-clay-deep to-clay text-white relative">
-        <div className="p-6 md:p-8 grid lg:grid-cols-[1.4fr_1fr] gap-6">
-          <div>
-            {f && <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-black/20 rounded-full px-3 py-1">🌾 {f.khasra}</span>}
-            <h1 className="text-3xl md:text-4xl font-extrabold mt-3">
-              {t("namaste")}, {f?.name || "Kisan Ji"}! <span className="text-marigold-light text-2xl font-bold">({f?.name_hi || "राम-रामसा"})</span>
-            </h1>
-            <p className="text-sand/90 mt-2 max-w-xl text-sm md:text-base leading-relaxed">
-              {lang === "hi"
-                ? "आपके 1.5-हेक्टेयर चिकनी-दोमट खेत के लिए त्वरित, नि:शुल्क कृषि सलाह। मिट्टी pH 7.4 पर स्थिर है।"
-                : <>Instant, zero-cost agronomic advisory customized for your <b>{f?.parcel || "1.5-hectare clay-loam parcel"}</b>. Soil pH is stable at {f?.ph || "7.4"}.</>}
-            </p>
-            <div className="grid grid-cols-3 gap-3 mt-5 max-w-lg">
-              {[["MOISTURE", f?.moisture], ["PEST RISK", f?.pest_risk], ["ACTIVE CYCLE", f?.cycle]].map((c, i) => (
-                <div key={i} className="bg-black/20 rounded-lg px-3 py-2">
-                  <div className="text-[10px] text-sand/70 font-semibold">{c[0]}</div>
-                  <div className="text-sm font-bold">{c[1] || "—"}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white text-soil rounded-xl p-4 self-start">
-            <div className="flex items-center gap-2">
-              <Mic size={18} className="text-clay" />
-              <span className="font-bold">{t("voice_mitra")}</span>
-              <span className="ml-auto text-[10px] bg-sand-container text-clay-dark rounded-full px-2 py-0.5 font-semibold">Hindi • English</span>
-            </div>
-            <p className="text-xs text-soil-variant mt-2 leading-relaxed">{t("voice_desc")}</p>
-            <button
-              data-testid="speak-question-btn"
-              onClick={() => openChat(true)}
-              className="mt-3 w-full bg-clay hover:bg-clay-deep text-white rounded-lg h-11 font-semibold flex items-center justify-center gap-2 transition-colors"
-            >
-              <Mic size={17} /> {t("speak_q")}
-            </button>
-          </div>
-        </div>
-      </section>
+      <Hero t={t} lang={lang} openChat={openChat} />
 
       {/* Action hub */}
       <section className="mt-8">
         <p className="text-[11px] font-bold tracking-widest text-clay uppercase">{t("empirical")}</p>
         <div className="flex flex-wrap items-end justify-between gap-2">
           <h2 className="text-2xl md:text-3xl font-extrabold text-soil">{t("action_hub")}</h2>
-          <p className="text-xs text-soil-variant max-w-sm">Calibrated to clay-loam density and semi-arid microclimates for maximum return on seed investment.</p>
+          <p className="text-xs text-soil-variant max-w-sm">{lang === "hi" ? "आपकी मिट्टी, जलवायु और बाज़ार के अनुसार सटीक, नि:शुल्क सलाह।" : "Precise, zero-cost advice calibrated to your soil, microclimate and market."}</p>
         </div>
         <div className="grid md:grid-cols-2 gap-4 mt-4">
           {MODULES.map((m) => <ModuleCard key={m.to} m={m} onSpeak={(txt) => speak(txt, lang)} />)}
