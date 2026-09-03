@@ -44,6 +44,7 @@ export default function MachineryAdvisor() {
         title={lang === "hi" ? "कस्टम कृषि मशीनरी सलाहकार" : "Customized Farm Machinery Advisor"}
         subtitle={lang === "hi" ? "मिट्टी-अनुकूल ट्रैक्टर व यंत्रों से मिट्टी की क्षति और डीजल खपत कम करें।" : "Prevent soil structural degradation and minimize diesel consumption with soil-matched tractor implements and custom power sizing."}
         badge="SMAM Subsidy Active (FY 25-26)"
+        hideListen
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-[380px_1fr] gap-5">

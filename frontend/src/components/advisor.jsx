@@ -1,7 +1,7 @@
 import { Volume2 } from "lucide-react";
 import { useLang, speak } from "@/store";
 
-export function PageHeader({ title, subtitle, badge, listenText }) {
+export function PageHeader({ title, subtitle, badge, listenText, hideListen = false }) {
   const { lang } = useLang();
   return (
     <div className="bg-forest-deep text-white">
@@ -12,13 +12,15 @@ export function PageHeader({ title, subtitle, badge, listenText }) {
             <p className="text-sand/80 mt-3 text-sm md:text-base leading-relaxed">{subtitle}</p>
           </div>
           <div className="flex flex-col gap-2">
-            <button
-              onClick={() => speak(listenText || `${title}. ${subtitle}`, lang)}
-              data-testid="page-listen"
-              className="flex items-center gap-2 bg-bloom-mist/20 hover:bg-bloom-mist/30 rounded-lg px-4 h-11 text-sm font-semibold"
-            >
-              <Volume2 size={16} /> {lang === "hi" ? "हिंदी में सुनें" : "Listen (AI Voice)"}
-            </button>
+            {!hideListen && (
+              <button
+                onClick={() => speak(listenText || `${title}. ${subtitle}`, lang)}
+                data-testid="page-listen"
+                className="flex items-center gap-2 bg-bloom-mist/20 hover:bg-bloom-mist/30 rounded-lg px-4 h-11 text-sm font-semibold"
+              >
+                <Volume2 size={16} /> {lang === "hi" ? "हिंदी में सुनें" : "Listen (AI Voice)"}
+              </button>
+            )}
             {badge && <span className="text-xs bg-clay rounded-full px-3 py-1 font-semibold text-center">● {badge}</span>}
           </div>
         </div>
