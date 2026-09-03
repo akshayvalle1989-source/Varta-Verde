@@ -11,6 +11,7 @@ module.exports = {
         sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'system-ui', 'sans-serif'],
         display: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'sans-serif'],
         deva: ['"Noto Sans Devanagari"', 'sans-serif'],
+        brand: ['"Yatra One"', '"Noto Sans Devanagari"', 'serif'],
       },
       colors: {
         clay: { DEFAULT: '#b85d36', deep: '#9c4724', rich: '#c86d44', dark: '#4a2818' },

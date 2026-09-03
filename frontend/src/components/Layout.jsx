@@ -36,7 +36,7 @@ function Navbar() {
           <NavLink to="/" className="flex items-center gap-2.5 shrink-0" data-testid="brand-logo">
             <Logo size={46} />
             <div className="leading-tight">
-              <div className="font-extrabold text-lg tracking-tight">Varta Verde</div>
+              <div className="font-brand text-[22px] leading-none tracking-wide text-marigold drop-shadow-[0_1px_0_rgba(0,0,0,0.35)]" data-testid="brand-wordmark">Varta Verde</div>
               <div className="text-[11px] text-sand/70 -mt-0.5">{t("tagline")}</div>
             </div>
           </NavLink>
