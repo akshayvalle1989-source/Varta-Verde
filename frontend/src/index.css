@@ -40,13 +40,14 @@
     ::selection { background: #b85d36; color: #fff; }
 }
 
-/* Warli-style dotted decorative divider */
+/* Warli-art decorative divider: dancing figures holding hands, triangle borders */
 .warli-band {
-    height: 26px;
+    height: 34px;
     background-color: #20432f;
-    background-image: radial-gradient(circle, #e8dacb 1.4px, transparent 1.5px);
-    background-size: 16px 16px;
+    background-repeat: repeat-x;
     background-position: center;
+    background-size: auto 34px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='34' viewBox='0 0 96 34' fill='%23e8dacb'%3E%3Cpath d='M0 0h6l-3 4zM12 0h6l-3 4zM24 0h6l-3 4zM36 0h6l-3 4zM48 0h6l-3 4zM60 0h6l-3 4zM72 0h6l-3 4zM84 0h6l-3 4zM3 34l3-4h-6zM15 34l3-4h-6zM27 34l3-4h-6zM39 34l3-4h-6zM51 34l3-4h-6zM63 34l3-4h-6zM75 34l3-4h-6zM87 34l3-4h-6z'/%3E%3Cg%3E%3Ccircle cx='12' cy='9' r='2.4'/%3E%3Cpath d='M12 11.5l-4.5 6h9z'/%3E%3Cpath d='M7.5 17.5l4.5-6 4.5 6-4.5 6z' transform='translate(0 5)'/%3E%3Cpath d='M12 28l-3.5 5M12 28l3.5 5M9 14l-7 -3M15 14l7 -3' stroke='%23e8dacb' stroke-width='1.6' stroke-linecap='round'/%3E%3C/g%3E%3Cg transform='translate(24 0)'%3E%3Ccircle cx='12' cy='9' r='2.4'/%3E%3Cpath d='M12 11.5l-4.5 6h9z'/%3E%3Cpath d='M7.5 17.5l4.5-6 4.5 6-4.5 6z' transform='translate(0 5)'/%3E%3Cpath d='M12 28l-3.5 5M12 28l3.5 5M9 14l-7 -3M15 14l7 -3' stroke='%23e8dacb' stroke-width='1.6' stroke-linecap='round'/%3E%3C/g%3E%3Cg transform='translate(48 0)'%3E%3Ccircle cx='12' cy='9' r='2.4'/%3E%3Cpath d='M12 11.5l-4.5 6h9z'/%3E%3Cpath d='M7.5 17.5l4.5-6 4.5 6-4.5 6z' transform='translate(0 5)'/%3E%3Cpath d='M12 28l-3.5 5M12 28l3.5 5M9 14l-7 -3M15 14l7 -3' stroke='%23e8dacb' stroke-width='1.6' stroke-linecap='round'/%3E%3C/g%3E%3Cg transform='translate(72 0)'%3E%3Ccircle cx='12' cy='9' r='2.4'/%3E%3Cpath d='M12 11.5l-4.5 6h9z'/%3E%3Cpath d='M7.5 17.5l4.5-6 4.5 6-4.5 6z' transform='translate(0 5)'/%3E%3Cpath d='M12 28l-3.5 5M12 28l3.5 5M9 14l-7 -3M15 14l7 -3' stroke='%23e8dacb' stroke-width='1.6' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 .field-card {

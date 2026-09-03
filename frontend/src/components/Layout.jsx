@@ -5,13 +5,15 @@ import VedaChat from "@/components/VedaChat";
 
 export function Logo({ size = 40 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-hidden="true">
-      <circle cx="32" cy="32" r="30" fill="#fff8f1" stroke="#9c4724" strokeWidth="3" />
-      <path d="M32 14c2 3 3 6 3 9s-1 5-3 6c-2-1-3-3-3-6s1-6 3-9z" fill="#eab308" />
-      <path d="M30 33c-4-3-9-3-13-1 2 5 7 8 13 6z" fill="#20432f" />
-      <path d="M34 33c4-3 9-3 13-1-2 5-7 8-13 6z" fill="#20432f" />
-      <path d="M23 40h18l-2 8H25l-2-8z" fill="#c86d44" stroke="#9c4724" strokeWidth="1.5" />
-    </svg>
+    <img
+      src="/logo.png"
+      alt="Varta Verde emblem"
+      width={size}
+      height={size}
+      data-testid="brand-logo-img"
+      className="rounded-full bg-[#fbf7f1] ring-2 ring-sand/80 object-cover shrink-0"
+      style={{ width: size, height: size }}
+    />
   );
 }
 
@@ -32,7 +34,7 @@ function Navbar() {
       <div className="bg-clay-dark text-sand">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-3">
           <NavLink to="/" className="flex items-center gap-2.5 shrink-0" data-testid="brand-logo">
-            <Logo size={40} />
+            <Logo size={46} />
             <div className="leading-tight">
               <div className="font-extrabold text-lg tracking-tight">Varta Verde</div>
               <div className="text-[11px] text-sand/70 -mt-0.5">{t("tagline")}</div>

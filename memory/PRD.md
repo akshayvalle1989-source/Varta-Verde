@@ -43,3 +43,7 @@ Build a complete website from the attached PRD (varta_verde_prd.pdf) using the p
 
 ## Next Tasks
 - Await user review of the MVP and gather feedback on which phase-2/3 features to prioritize.
+
+## Update (2026-06)
+- Replaced SVG logo with user-provided Warli emblem (`/frontend/public/logo.png`, rendered via `Logo` in Layout.jsx).
+- Replaced green polka-dot `.warli-band` divider with an inline-SVG Warli art strip (dancing figures + triangle borders) in `index.css`.
