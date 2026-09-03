@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Tractor, Wheat, Flower2, Leaf, Volume2, Mic, ArrowRight, PlayCircle,
-  BadgeCheck, Download, FlaskConical, Phone, Camera, Sprout,
+  BadgeCheck, Download, Sprout,
 } from "lucide-react";
 import { useLang, useChat, speak } from "@/store";
 import { api } from "@/lib/api";
@@ -203,19 +203,6 @@ export default function Home() {
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* KVK diagnostic */}
-      <section className="mt-8 field-card p-6 bg-sand-container flex flex-col md:flex-row items-center gap-4">
-        <div className="h-14 w-14 rounded-xl bg-bloom-mist grid place-items-center shrink-0"><FlaskConical size={26} className="text-clay" /></div>
-        <div className="flex-1">
-          <h3 className="font-bold text-soil flex items-center gap-2">Need Diagnostic Assistance for Your Field? <span className="text-[10px] bg-forest text-white rounded-full px-2 py-0.5">KVK Online</span></h3>
-          <p className="text-sm text-soil-variant mt-1">Submit soil photos or plant disease leaves to Krishi Vigyan Kendra scientists. Get laboratory-verified advisory within 4 hours.</p>
-        </div>
-        <div className="flex gap-2">
-          <button className="bg-white border border-sand-ochre rounded-lg px-4 h-11 text-sm font-semibold flex items-center gap-2 text-soil"><Camera size={16} /> Upload Pest Photo</button>
-          <a href="tel:18001801551" className="bg-clay hover:bg-clay-deep text-white rounded-lg px-4 h-11 text-sm font-semibold flex items-center gap-2"><Phone size={16} /> Call Agronomist</a>
         </div>
       </section>
     </div>
