@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
-import { Mic, ArrowRight, Globe2, Leaf, Wind, TrendingUp, ShieldCheck, Sprout, Landmark } from "lucide-react";
+import { Mic, ArrowRight, Globe2, Leaf, Wind, Droplets, FlaskConical, Sprout, Landmark } from "lucide-react";
 
 const PILLARS = [
-  { icon: Globe2, en: "Sustainable Development Goals", hi: "सतत विकास लक्ष्य (SDG)" },
+  { icon: Droplets, en: "Landscape-level water conservation", hi: "भू-दृश्य स्तर पर जल संरक्षण" },
+  { icon: FlaskConical, en: "Reduce reliance on synthetic inputs", hi: "रासायनिक इनपुट पर निर्भरता कम करें" },
+  { icon: Wind, en: "Accelerate soil carbon sequestration", hi: "मृदा कार्बन संचयन को गति दें" },
+  { icon: Sprout, en: "Drought-hardy native landraces & climate-resilient practices", hi: "सूखा-सहनशील देसी किस्में व जलवायु-लचीली पद्धतियाँ" },
+  { icon: Globe2, en: "Achieve the Sustainable Development Goals", hi: "सतत विकास लक्ष्यों (SDG) की प्राप्ति" },
   { icon: Leaf, en: "Mission LiFE — Lifestyle for Environment", hi: "मिशन LiFE — पर्यावरण अनुकूल जीवनशैली" },
-  { icon: Wind, en: "Real solutions to cut farm emissions", hi: "खेती से उत्सर्जन घटाने के व्यावहारिक समाधान" },
-  { icon: TrendingUp, en: "Improve productivity & income", hi: "उत्पादकता और आय में वृद्धि" },
-  { icon: ShieldCheck, en: "Biosafety & soil health", hi: "जैव-सुरक्षा और मिट्टी का स्वास्थ्य" },
-  { icon: Sprout, en: "Climate & disease-resistant landraces", hi: "जलवायु व रोग-प्रतिरोधी देसी बीज" },
 ];
 
 const PHOTOS = [
@@ -30,13 +30,18 @@ export function Hero({ t, lang, openChat }) {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mt-4 leading-[1.1]">
             {hi ? <>खेती जो धरती को भी <span className="text-marigold-light">समृद्ध</span> करे</> : <>Farming that leaves the land <span className="text-marigold-light">richer</span> than it found it</>}
           </h1>
-          <p className="text-sand/90 mt-4 max-w-xl text-sm md:text-base leading-relaxed">
+          <p className="text-sand/90 mt-4 max-w-xl text-sm md:text-base leading-relaxed" data-testid="hero-intro">
             {hi
-              ? "वर्ता वर्दे आपकी मिट्टी, जलवायु और बाज़ार को समझकर ऐसी सलाह देता है जो सतत विकास लक्ष्यों और मिशन LiFE के अनुरूप हो — कम उत्सर्जन, अधिक उत्पादकता, सुरक्षित खेत और लचीली देसी किस्में — और अंत में आपको सही सरकारी योजना तक पहुँचाता है।"
-              : "Varta Verde reads your soil, climate and market to give advice aligned with the Sustainable Development Goals and Mission LiFE — lower emissions, higher productivity, safer fields and resilient landraces — and then walks you straight to the government scheme built for you."}
+              ? "ISRO के अनुसार भारत की 30% भूमि पहले ही क्षरित हो चुकी है और कृषि हमारे तेज़ी से घटते भूजल का 85% उपयोग करती है — हमारी पारिस्थितिक स्थिरता एक निर्णायक मोड़ पर है। वर्ता वर्दे स्थानीय मिट्टी, जलवायु और बाज़ार के आँकड़ों का विश्लेषण कर सटीक कृषि सलाह देता है और छोटे किसानों को पात्र सरकारी सततता सब्सिडी से सहजता से जोड़ता है।"
+              : <>With ISRO reporting that <b className="text-white">30% of India's land is already degraded</b> and agriculture consuming <b className="text-white">85% of our rapidly depleting groundwater</b>, our ecological stability has reached a critical tipping point. Varta Verde helps reverse this trajectory by analyzing localized soil, climate, and market data to deliver hyper-targeted agronomic advice while seamlessly connecting smallholders to eligible government sustainability subsidies.</>}
+          </p>
+          <p className="text-sand/80 mt-3 max-w-xl text-sm leading-relaxed">
+            {hi
+              ? "सूखा-सहनशील देसी फसलों और जलवायु-लचीली पद्धतियों को बढ़ावा देकर वर्ता वर्दे ग्रामीण समुदायों को सशक्त बनाता है कि वे:"
+              : "Through the promotion of drought-hardy native crops (landraces) and climate-resilient practices, Varta Verde empowers rural communities to:"}
           </p>
 
-          <ul className="grid sm:grid-cols-2 gap-x-5 gap-y-2.5 mt-6" data-testid="hero-pillars">
+          <ul className="grid sm:grid-cols-2 gap-x-5 gap-y-2.5 mt-4" data-testid="hero-pillars">
             {PILLARS.map((p, i) => {
               const I = p.icon;
               return (
