@@ -1,6 +1,7 @@
 # Here are your Instructions
 # Vartha Verde 🌾
 <img width="1584" height="672" alt="Gemini_Generated_Image_h5ct7lh5ct7lh5ct" src="https://github.com/user-attachments/assets/f380d0e3-445a-4465-9dd4-823c21fcd3a4" />
+<img width="831" height="973" alt="1000039445" src="https://github.com/user-attachments/assets/6bc14a32-e86f-41bc-9356-c466602dc234" />
 
 
 *AI-Powered Agricultural Assistant for Indian Smallholder Farmers*
